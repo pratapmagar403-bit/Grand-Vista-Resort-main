@@ -1,0 +1,889 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grand Vista Resort - Hotel Management System</title>
+    <meta name="description" content="Smart 5-Star Hotel Operations & PMS with real-time room availability matrix, guest reservations, housekeeping queue, billing folios, staff roster, and executive analytics." />
+    <meta property="og:title" content="Grand Vista Resort - Hotel Management System" />
+    <meta property="og:description" content="Smart 5-Star Hotel Operations & PMS with real-time room availability matrix, guest reservations, housekeeping queue, billing folios, staff roster, and executive analytics." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+              heading: ['"Outfit"', 'sans-serif'],
+            },
+            colors: {
+              navy: {
+                950: '#080c14',
+                900: '#0b1120',
+                850: '#10172e',
+                800: '#1e293b',
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body class="bg-[#f3f6fa] text-slate-900 antialiased selection:bg-amber-500 selection:text-white min-h-screen flex flex-col">
+
+    <!-- TOP HEADER -->
+    <header class="bg-[#0b101d] border-b border-slate-800/80 sticky top-0 z-40">
+      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+        
+        <!-- Logo & Resort Title -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-slate-950 shadow-md shadow-amber-500/20">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/>
+              <path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/>
+              <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/>
+              <path d="M10 6h4"/>
+              <path d="M10 10h4"/>
+              <path d="M10 14h4"/>
+              <path d="M10 18h4"/>
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-extrabold text-white text-lg tracking-tight font-heading">Grand Vista Resort</span>
+              <span class="border border-amber-400/40 bg-amber-400/10 text-amber-400 text-[11px] font-bold px-2 py-0.5 rounded-full tracking-wide">5-Star PMS</span>
+            </div>
+            <p class="text-[12px] text-slate-400 font-medium">Smart Hotel Operations & Guest Experience</p>
+          </div>
+        </div>
+
+        <!-- Top Right Actions & Status -->
+        <div class="flex items-center gap-3">
+          <!-- Live Occupancy Pill -->
+          <div id="liveOccupancyBadge" class="bg-[#121829] border border-slate-800 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-medium text-slate-300 shadow-inner">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span>Live Occupancy: <strong class="text-emerald-400 font-bold" id="headerOccupancyText">30%</strong></span>
+          </div>
+
+          <!-- AI Concierge Button -->
+          <button id="btnOpenConcierge" onclick="openConciergeModal()" class="bg-[#6366f1] hover:bg-[#4f46e5] active:scale-95 text-white text-xs font-semibold px-3.5 py-2 rounded-lg flex items-center gap-2 shadow-sm transition-all">
+            <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+              <path d="M5 3v4"/>
+              <path d="M19 17v4"/>
+              <path d="M3 5h4"/>
+              <path d="M17 19h4"/>
+            </svg>
+            <span>AI Concierge</span>
+          </button>
+
+          <!-- New Reservation Button -->
+          <button id="btnHeaderNewRes" onclick="openNewReservationModal()" class="bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-950 text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 shadow-sm transition-all">
+            <svg class="w-4 h-4 text-slate-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>+ New Reservation</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- NAVIGATION TABS -->
+      <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 overflow-x-auto">
+        <nav class="flex items-center gap-1.5 py-2 border-t border-slate-800/60" id="mainNavTabs">
+          
+          <button id="tab-dashboard" onclick="switchTab('dashboard')" class="tab-btn active bg-amber-500 text-slate-950 font-bold px-3.5 py-2 rounded-lg text-xs md:text-sm flex items-center gap-2 shadow-sm transition-all whitespace-nowrap">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Dashboard</span>
+          </button>
+
+          <button id="tab-rooms" onclick="switchTab('rooms')" class="tab-btn text-slate-400 hover:text-white hover:bg-slate-800/50 px-3.5 py-2 rounded-lg text-xs md:text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M2 4v16"></path>
+              <path d="M2 8h18a2 2 0 0 1 2 2v10"></path>
+              <path d="M2 17h20"></path>
+              <path d="M6 8v9"></path>
+            </svg>
+            <span>Rooms & Floors</span>
+          </button>
+
+          <button id="tab-reservations" onclick="switchTab('reservations')" class="tab-btn text-slate-400 hover:text-white hover:bg-slate-800/50 px-3.5 py-2 rounded-lg text-xs md:text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span>Reservations</span>
+          </button>
+
+          <button id="tab-crm" onclick="switchTab('crm')" class="tab-btn text-slate-400 hover:text-white hover:bg-slate-800/50 px-3.5 py-2 rounded-lg text-xs md:text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>Guest CRM</span>
+          </button>
+
+          <button id="tab-housekeeping" onclick="switchTab('housekeeping')" class="tab-btn text-slate-400 hover:text-white hover:bg-slate-800/50 px-3.5 py-2 rounded-lg text-xs md:text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2v8"></path>
+              <path d="m4.93 10.93 4.24 4.24"></path>
+              <path d="M2 18h20"></path>
+              <path d="M20 18l-3-8H7l-3 8"></path>
+            </svg>
+            <span>Housekeeping</span>
+          </button>
+
+          <button id="tab-billing" onclick="switchTab('billing')" class="tab-btn text-slate-400 hover:text-white hover:bg-slate-800/50 px-3.5 py-2 rounded-lg text-xs md:text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+              <line x1="2" y1="10" x2="22" y2="10"></line>
+            </svg>
+            <span>Billing & Folios</span>
+          </button>
+
+          <button id="tab-staff" onclick="switchTab('staff')" class="tab-btn text-slate-400 hover:text-white hover:bg-slate-800/50 px-3.5 py-2 rounded-lg text-xs md:text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="7" r="4"></circle>
+              <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"></path>
+            </svg>
+            <span>Staff Roster</span>
+          </button>
+
+          <button id="tab-analytics" onclick="switchTab('analytics')" class="tab-btn text-slate-400 hover:text-white hover:bg-slate-800/50 px-3.5 py-2 rounded-lg text-xs md:text-sm font-medium flex items-center gap-2 transition-all whitespace-nowrap">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <span>Analytics</span>
+          </button>
+
+        </nav>
+      </div>
+    </header>
+
+    <!-- MAIN WRAPPER -->
+    <main class="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+      <!-- ================= SECTION 1: DASHBOARD (Identical to Screenshot) ================= -->
+      <section id="view-dashboard" class="view-panel space-y-6">
+
+        <!-- Executive Operations Hero Card -->
+        <div class="rounded-2xl bg-[#0f172e] border border-slate-800/80 p-6 md:p-8 text-white shadow-lg relative overflow-hidden">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+            <div>
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-400 text-xs font-semibold">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+                </svg>
+                <span>Smart Operations Active</span>
+              </div>
+              <h1 class="text-2xl md:text-3xl font-extrabold font-heading mt-3 tracking-tight">Executive Operations Dashboard</h1>
+              <p class="text-slate-300 text-sm md:text-base mt-2 max-w-2xl leading-relaxed">
+                Real-time monitoring of room statuses, active reservations, guest billing, and housekeeping schedules at Grand Vista Resort.
+              </p>
+            </div>
+
+            <!-- Hero Action Buttons -->
+            <div class="flex items-center gap-3">
+              <button onclick="openCopilotModal()" class="bg-[#1e293b]/90 hover:bg-[#334155] border border-slate-700/80 text-white font-medium px-4 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-sm transition-all active:scale-95">
+                <svg class="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+                </svg>
+                <span>Ask AI Co-Pilot</span>
+              </button>
+              
+              <button onclick="openNewReservationModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-sm flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition-all active:scale-95">
+                <svg class="w-4 h-4 text-slate-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>+ New Reservation</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 KPI Metrics Row (Matching Screenshot) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          
+          <!-- Card 1: Occupancy Rate -->
+          <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm flex flex-col justify-between">
+            <div class="flex items-start justify-between">
+              <span class="text-xs font-semibold text-slate-500">Occupancy Rate</span>
+              <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M2 4v16"></path>
+                  <path d="M2 8h18a2 2 0 0 1 2 2v10"></path>
+                  <path d="M2 17h20"></path>
+                  <path d="M6 8v9"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="mt-3">
+              <div class="flex items-baseline gap-2">
+                <span class="text-3xl font-extrabold text-slate-900 font-heading" id="kpiOccupancyRate">30%</span>
+                <span class="text-xs font-bold text-emerald-600 flex items-center">
+                  <svg class="w-3.5 h-3.5 mr-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                  </svg>
+                  +4.2% vs last week
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 mt-1" id="kpiOccupancyRooms">3 of 10 rooms occupied</p>
+            </div>
+          </div>
+
+          <!-- Card 2: Total Month Revenue -->
+          <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm flex flex-col justify-between">
+            <div class="flex items-start justify-between">
+              <span class="text-xs font-semibold text-slate-500">Total Month Revenue</span>
+              <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="mt-3">
+              <div class="flex items-baseline gap-2">
+                <span class="text-3xl font-extrabold text-slate-900 font-heading" id="kpiTotalRevenue">₹164,900</span>
+                <span class="text-xs font-bold text-emerald-600 flex items-center">
+                  <svg class="w-3.5 h-3.5 mr-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                  </svg>
+                  Settled Folios
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 mt-1" id="kpiAdrRevpar">ADR: ₹26917 | RevPAR: ₹8075</p>
+            </div>
+          </div>
+
+          <!-- Card 3: Today's Check-Ins -->
+          <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm flex flex-col justify-between">
+            <div class="flex items-start justify-between">
+              <span class="text-xs font-semibold text-slate-500">Today's Check-Ins</span>
+              <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </div>
+            </div>
+            <div class="mt-3">
+              <div class="flex items-baseline gap-2">
+                <span class="text-3xl font-extrabold text-slate-900 font-heading" id="kpiTodayCheckins">2 Guests</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-1" id="kpiTodayCheckouts">0 Check-Outs scheduled today</p>
+            </div>
+          </div>
+
+          <!-- Card 4: Housekeeping Queue -->
+          <div class="bg-white rounded-2xl p-5 border border-slate-200/90 shadow-sm flex flex-col justify-between">
+            <div class="flex items-start justify-between">
+              <span class="text-xs font-semibold text-slate-500">Housekeeping Queue</span>
+              <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m2 22 1-1h3l9-9"></path>
+                  <path d="M3 21v-3l9-9"></path>
+                  <path d="m15 6 3 3"></path>
+                  <path d="m18 3 3 3"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="mt-3">
+              <div class="flex items-center gap-2">
+                <span class="text-3xl font-extrabold text-slate-900 font-heading" id="kpiHousekeepingTasks">3 Tasks</span>
+                <span class="bg-rose-50 border border-rose-200 text-rose-600 text-[11px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
+                  <svg class="w-3 h-3 text-rose-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                  Urgent
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 mt-1" id="kpiHousekeepingSubtitle">3 tasks needing staff assignment</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Main Dashboard Split Grid (2/3 & 1/3) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          <!-- Left 2/3: Live Room Availability Matrix -->
+          <div class="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm flex flex-col">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+              <div>
+                <h2 class="text-lg font-bold text-slate-900 font-heading">Live Room Availability Matrix</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Overview of all resort accommodation statuses</p>
+              </div>
+              <button onclick="switchTab('rooms')" class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs flex items-center gap-1">
+                <span>Manage Rooms</span>
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Dynamic Room Matrix Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-5" id="dashboardRoomMatrix">
+              <!-- Dynamically populated via JavaScript -->
+            </div>
+
+            <!-- Room Status Legend -->
+            <div class="mt-6 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-500">
+              <div class="flex items-center gap-4">
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Available</span>
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span> Occupied</span>
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Reserved</span>
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Cleaning</span>
+              </div>
+              <span class="text-slate-400">Click any room card for fast status updates or guest assignment</span>
+            </div>
+          </div>
+
+          <!-- Right 1/3: Today's Guests -->
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm flex flex-col">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+              <h2 class="text-lg font-bold text-slate-900 font-heading">Today's Guests</h2>
+              <button onclick="switchTab('reservations')" class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs">View All</button>
+            </div>
+
+            <!-- Dynamic Guest List Container -->
+            <div class="space-y-3.5 mt-4 flex-1" id="dashboardGuestsList">
+              <!-- Dynamically populated via JavaScript -->
+            </div>
+
+            <div class="mt-5 pt-3 border-t border-slate-100">
+              <button onclick="openNewReservationModal()" class="w-full py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl flex items-center justify-center gap-2 transition-all">
+                <svg class="w-4 h-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Express Guest Check-In</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ================= SECTION 2: ROOMS & FLOORS ================= -->
+      <section id="view-rooms" class="view-panel hidden space-y-6">
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+            <div>
+              <h2 class="text-xl font-bold text-slate-900 font-heading">Resort Accommodation Inventory</h2>
+              <p class="text-xs text-slate-500 mt-1">Live status, floor plans, room pricing, and maintenance logs</p>
+            </div>
+
+            <!-- Filter controls -->
+            <div class="flex flex-wrap items-center gap-2">
+              <div class="flex bg-slate-100 p-1 rounded-xl text-xs font-medium" id="floorFilterGroup">
+                <button onclick="filterRooms('all')" class="floor-pill active bg-white text-slate-900 shadow-sm px-3 py-1 rounded-lg">All Floors</button>
+                <button onclick="filterRooms('1')" class="floor-pill text-slate-500 px-3 py-1 rounded-lg">Floor 1</button>
+                <button onclick="filterRooms('2')" class="floor-pill text-slate-500 px-3 py-1 rounded-lg">Floor 2</button>
+                <button onclick="filterRooms('3')" class="floor-pill text-slate-500 px-3 py-1 rounded-lg">Floor 3 (VIP)</button>
+              </div>
+
+              <button onclick="openNewRoomModal()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all">
+                <span>+ Add Room</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Room Catalog Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6" id="roomsFullGrid">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SECTION 3: RESERVATIONS ================= -->
+      <section id="view-reservations" class="view-panel hidden space-y-6">
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+            <div>
+              <h2 class="text-xl font-bold text-slate-900 font-heading">Guest Reservations & Bookings</h2>
+              <p class="text-xs text-slate-500 mt-1">Manage guest stays, payments, identity checks, and check-in / check-out workflows</p>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <div class="relative">
+                <input type="text" id="reservationSearchInput" oninput="searchReservations(this.value)" placeholder="Search guest, room..." class="pl-8 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 w-48 sm:w-64" />
+                <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </div>
+
+              <button onclick="openNewReservationModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-sm">
+                <span>+ New Booking</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Reservations Table -->
+          <div class="overflow-x-auto mt-4">
+            <table class="w-full text-left text-xs text-slate-700">
+              <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200 uppercase tracking-wider text-[10px]">
+                <tr>
+                  <th class="py-3 px-4">Booking ID</th>
+                  <th class="py-3 px-4">Guest Details</th>
+                  <th class="py-3 px-4">Room & Type</th>
+                  <th class="py-3 px-4">Stay Dates</th>
+                  <th class="py-3 px-4">Total Amount</th>
+                  <th class="py-3 px-4">Status</th>
+                  <th class="py-3 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="reservationsTableBody" class="divide-y divide-slate-100">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SECTION 4: GUEST CRM ================= -->
+      <section id="view-crm" class="view-panel hidden space-y-6">
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+            <div>
+              <h2 class="text-xl font-bold text-slate-900 font-heading">Guest CRM & VIP Loyalty Directory</h2>
+              <p class="text-xs text-slate-500 mt-1">Guest preferences, lifetime spend records, dietary notes, and stay histories</p>
+            </div>
+            <button onclick="openAddGuestModal()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5">
+              <span>+ Add Guest Record</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6" id="guestsDirectoryGrid">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SECTION 5: HOUSEKEEPING ================= -->
+      <section id="view-housekeeping" class="view-panel hidden space-y-6">
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+            <div>
+              <h2 class="text-xl font-bold text-slate-900 font-heading">Housekeeping & Room Turnaround Queue</h2>
+              <p class="text-xs text-slate-500 mt-1">Real-time room sanitization, linen replenishment, and luxury inspection checklists</p>
+            </div>
+            <button onclick="openNewHousekeepingModal()" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-sm">
+              <span>+ Create Cleaning Task</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <!-- Pending Column -->
+            <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-600">Pending Assignment (<span id="hkPendingCount">2</span>)</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+              </div>
+              <div class="space-y-3" id="hkPendingColumn"></div>
+            </div>
+
+            <!-- In-Progress Column -->
+            <div class="bg-indigo-50/40 rounded-2xl p-4 border border-indigo-100">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-indigo-700">Cleaning In Progress (<span id="hkInProgressCount">1</span>)</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+              </div>
+              <div class="space-y-3" id="hkInProgressColumn"></div>
+            </div>
+
+            <!-- Completed Column -->
+            <div class="bg-emerald-50/40 rounded-2xl p-4 border border-emerald-100">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-emerald-700">Completed (<span id="hkCompletedCount">1</span>)</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              </div>
+              <div class="space-y-3" id="hkCompletedColumn"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SECTION 6: BILLING & FOLIOS ================= -->
+      <section id="view-billing" class="view-panel hidden space-y-6">
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+            <div>
+              <h2 class="text-xl font-bold text-slate-900 font-heading">Billing Folios & Invoicing</h2>
+              <p class="text-xs text-slate-500 mt-1">Itemized resort folios, dining charges, spa treatments, and 18% GST settlements</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+            <!-- Folios list -->
+            <div class="space-y-3" id="foliosList"></div>
+
+            <!-- Folio Detailed Preview (Takes 2 columns) -->
+            <div class="lg:col-span-2 bg-slate-50 rounded-2xl p-6 border border-slate-200" id="folioDetailView">
+              <!-- Populated when selecting a folio -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SECTION 7: STAFF ROSTER ================= -->
+      <section id="view-staff" class="view-panel hidden space-y-6">
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+            <div>
+              <h2 class="text-xl font-bold text-slate-900 font-heading">Staff Roster & Admin Management</h2>
+              <p class="text-xs text-slate-500 mt-1">Oversee duty shifts, department leads, housekeeping assignments, and contact channels</p>
+            </div>
+            <button onclick="openAddStaffModal()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5">
+              <span>+ Add Team Member</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-6" id="staffRosterGrid">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SECTION 8: ANALYTICS ================= -->
+      <section id="view-analytics" class="view-panel hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Revenue by Category -->
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm">
+            <h2 class="text-lg font-bold text-slate-900 font-heading">Revenue by Category</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Month-to-date breakdown</p>
+            <div class="space-y-3.5 mt-5" id="analyticsCategoryBreakdown">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+
+          <!-- Occupancy & Revenue Trend Chart (SVG) -->
+          <div class="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <h2 class="text-lg font-bold text-slate-900 font-heading">Weekly Occupancy & Revenue Curve</h2>
+                  <p class="text-xs text-slate-500 mt-0.5">Occupancy Rate (%) and gross revenue flow</p>
+                </div>
+                <span class="bg-emerald-50 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-lg border border-emerald-200">+4.2% Growth</span>
+              </div>
+
+              <!-- Visual SVG Chart -->
+              <div class="mt-6 h-56 w-full" id="analyticsChartContainer">
+                <svg class="w-full h-full" viewBox="0 0 500 180" fill="none">
+                  <!-- Grid lines -->
+                  <line x1="30" y1="20" x2="480" y2="20" stroke="#f1f5f9" stroke-width="1"></line>
+                  <line x1="30" y1="60" x2="480" y2="60" stroke="#f1f5f9" stroke-width="1"></line>
+                  <line x1="30" y1="100" x2="480" y2="100" stroke="#f1f5f9" stroke-width="1"></line>
+                  <line x1="30" y1="140" x2="480" y2="140" stroke="#f1f5f9" stroke-width="1"></line>
+
+                  <!-- Area fill -->
+                  <path d="M 50 140 Q 110 130, 170 120 T 290 80 T 410 40 L 410 160 L 50 160 Z" fill="url(#chartGrad)" opacity="0.25"></path>
+                  <!-- Trend line -->
+                  <path d="M 50 140 Q 110 130, 170 120 T 290 80 T 410 40" stroke="#f59e0b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                  
+                  <!-- Dots -->
+                  <circle cx="50" cy="140" r="4.5" fill="#f59e0b" stroke="#fff" stroke-width="2"></circle>
+                  <circle cx="110" cy="130" r="4.5" fill="#f59e0b" stroke="#fff" stroke-width="2"></circle>
+                  <circle cx="170" cy="120" r="4.5" fill="#f59e0b" stroke="#fff" stroke-width="2"></circle>
+                  <circle cx="230" cy="100" r="4.5" fill="#f59e0b" stroke="#fff" stroke-width="2"></circle>
+                  <circle cx="290" cy="80" r="4.5" fill="#f59e0b" stroke="#fff" stroke-width="2"></circle>
+                  <circle cx="350" cy="55" r="4.5" fill="#f59e0b" stroke="#fff" stroke-width="2"></circle>
+                  <circle cx="410" cy="40" r="5" fill="#f59e0b" stroke="#fff" stroke-width="2.5"></circle>
+
+                  <!-- Labels -->
+                  <text x="50" y="175" font-size="10" fill="#94a3b8" text-anchor="middle">Mon</text>
+                  <text x="110" y="175" font-size="10" fill="#94a3b8" text-anchor="middle">Tue</text>
+                  <text x="170" y="175" font-size="10" fill="#94a3b8" text-anchor="middle">Wed</text>
+                  <text x="230" y="175" font-size="10" fill="#94a3b8" text-anchor="middle">Thu</text>
+                  <text x="290" y="175" font-size="10" fill="#94a3b8" text-anchor="middle">Fri</text>
+                  <text x="350" y="175" font-size="10" fill="#94a3b8" text-anchor="middle">Sat</text>
+                  <text x="410" y="175" font-size="10" fill="#94a3b8" text-anchor="middle">Sun</text>
+
+                  <defs>
+                    <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.8"></stop>
+                      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.0"></stop>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 pt-4 border-t border-slate-100 text-center">
+              <div>
+                <span class="text-slate-400 text-xs font-medium">Average Daily Rate</span>
+                <p class="text-base font-bold text-slate-900 font-heading">₹26,917</p>
+              </div>
+              <div>
+                <span class="text-slate-400 text-xs font-medium">RevPAR Index</span>
+                <p class="text-base font-bold text-slate-900 font-heading">₹8,075</p>
+              </div>
+              <div>
+                <span class="text-slate-400 text-xs font-medium">Projected Weekend</span>
+                <p class="text-base font-bold text-emerald-600 font-heading">85% Occupancy</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- 1. NEW RESERVATION MODAL -->
+    <div id="modalNewReservation" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 modal-card overflow-y-auto max-h-[90vh]">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900 font-heading">Create New Guest Reservation</h3>
+            <p class="text-xs text-slate-500">Secure real-time booking and folio generation</p>
+          </div>
+          <button onclick="closeModal('modalNewReservation')" class="text-slate-400 hover:text-slate-600 p-1">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <form id="formNewReservation" onsubmit="submitNewReservation(event)" class="space-y-4 mt-4 text-xs">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Guest Full Name *</label>
+            <input type="text" id="resGuestName" required placeholder="e.g., Katherine Miller" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Email Address *</label>
+              <input type="email" id="resGuestEmail" required placeholder="guest@example.com" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Phone Number *</label>
+              <input type="text" id="resGuestPhone" required placeholder="+1 (555) 000-0000" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Assign Room *</label>
+              <select id="resRoomSelect" onchange="calculateReservationCost()" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none bg-white font-medium">
+                <!-- Dynamically populated available rooms -->
+              </select>
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Number of Guests</label>
+              <select id="resGuestsCount" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none bg-white">
+                <option value="1">1 Adult</option>
+                <option value="2" selected>2 Adults</option>
+                <option value="3">3 Adults</option>
+                <option value="4">4 Guests (Family)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Check-In Date *</label>
+              <input type="date" id="resCheckIn" onchange="calculateReservationCost()" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Check-Out Date *</label>
+              <input type="date" id="resCheckOut" onchange="calculateReservationCost()" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Special Preferences / Requests</label>
+            <textarea id="resSpecialRequests" rows="2" placeholder="e.g. Airport EV pickup, high floor ocean view, feather allergy" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"></textarea>
+          </div>
+
+          <div class="bg-amber-50 rounded-xl p-3.5 border border-amber-200/80 flex items-center justify-between">
+            <div>
+              <span class="text-slate-600 font-medium">Estimated Stay Rate</span>
+              <p class="text-xs text-slate-500" id="resNightsCalculation">1 night @ ₹15,300/night</p>
+            </div>
+            <div class="text-right">
+              <span class="text-xs text-slate-500">Total (incl. 18% GST)</span>
+              <p class="text-lg font-extrabold text-slate-900 font-heading" id="resEstimatedTotal">₹18,054</p>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+            <button type="button" onclick="closeModal('modalNewReservation')" class="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl font-medium">Cancel</button>
+            <button type="submit" id="btnSubmitRes" class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl shadow-sm transition-all">Confirm Booking</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 2. ASK AI CO-PILOT MODAL -->
+    <div id="modalCopilot" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 modal-card flex flex-col max-h-[90vh]">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-slate-950">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-slate-900 font-heading">Grand Vista Executive AI Co-Pilot</h3>
+              <p class="text-xs text-slate-500">Real-time revenue, occupancy & operational guidance</p>
+            </div>
+          </div>
+          <button onclick="closeModal('modalCopilot')" class="text-slate-400 hover:text-slate-600 p-1">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Co-Pilot response area -->
+        <div id="copilotResponseBox" class="my-4 p-4 rounded-xl bg-slate-50 border border-slate-200/80 text-xs text-slate-700 overflow-y-auto flex-1 min-h-[160px] max-h-[300px] leading-relaxed whitespace-pre-line">
+          Click a quick insight prompt below or ask any question about current occupancy, pending housekeeping tasks, or revenue optimization.
+        </div>
+
+        <!-- Quick prompts -->
+        <div class="flex flex-wrap gap-2 text-xs mb-3">
+          <button onclick="askCopilotPrompt('Give me a full executive morning briefing on occupancy and arrivals.')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg border border-slate-200/80 font-medium">📋 Executive Briefing</button>
+          <button onclick="askCopilotPrompt('How do we maximize RevPAR for the remaining vacant Executive Suites this week?')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg border border-slate-200/80 font-medium">📈 Maximize RevPAR</button>
+          <button onclick="askCopilotPrompt('Which housekeeping tasks are most critical before today\'s 15:00 check-ins?')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg border border-slate-200/80 font-medium">🧹 Critical Cleanings</button>
+        </div>
+
+        <div class="flex items-center gap-2 pt-3 border-t border-slate-100">
+          <input type="text" id="copilotInput" placeholder="Ask Co-Pilot about resort operations..." onkeydown="if(event.key==='Enter') sendCopilotQuery()" class="flex-1 px-3.5 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none" />
+          <button onclick="sendCopilotQuery()" id="btnSendCopilot" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl">Ask</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. AI CONCIERGE MODAL -->
+    <div id="modalConcierge" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 modal-card flex flex-col max-h-[90vh]">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v20"></path>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-slate-900 font-heading">5-Star Luxury AI Concierge</h3>
+              <p class="text-xs text-slate-500">Fine dining, bespoke spa therapies & yacht bookings</p>
+            </div>
+          </div>
+          <button onclick="closeModal('modalConcierge')" class="text-slate-400 hover:text-slate-600 p-1">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div id="conciergeResponseBox" class="my-4 p-4 rounded-xl bg-indigo-50/50 border border-indigo-100 text-xs text-slate-700 overflow-y-auto flex-1 min-h-[160px] max-h-[300px] leading-relaxed whitespace-pre-line">
+          Welcome to Grand Vista Resort & Spa Concierge. How may we delight our guests today? Select a guest or choose from our signature services below.
+        </div>
+
+        <div class="flex items-center gap-2 text-xs mb-3">
+          <select id="conciergeGuestSelect" class="bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-lg text-slate-700 font-medium">
+            <option value="">General Guest</option>
+            <option value="Eleanor Vance">Eleanor Vance (Room 101)</option>
+            <option value="Marcus Holloway">Marcus Holloway (Room 201)</option>
+            <option value="Sophia Chen">Sophia Chen (Room 104)</option>
+          </select>
+          <button onclick="askConciergePreset('Suggest a romantic 5-course anniversary dinner and sunset wine pairing.')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-medium">🍷 Dinner Pairing</button>
+          <button onclick="askConciergePreset('Book a private sunset catamaran excursion.')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-medium">⛵ Catamaran</button>
+        </div>
+
+        <div class="flex items-center gap-2 pt-3 border-t border-slate-100">
+          <input type="text" id="conciergeInput" placeholder="Request dining, spa, chauffeur..." onkeydown="if(event.key==='Enter') sendConciergeQuery()" class="flex-1 px-3.5 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none" />
+          <button onclick="sendConciergeQuery()" id="btnSendConcierge" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl">Inquire</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. QUICK ROOM STATUS MODAL -->
+    <div id="modalRoomStatus" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 modal-card">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <h3 class="text-base font-bold text-slate-900 font-heading" id="modalRoomTitle">Room 101</h3>
+          <button onclick="closeModal('modalRoomStatus')" class="text-slate-400 hover:text-slate-600 p-1">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="space-y-3 mt-4 text-xs">
+          <div>
+            <span class="text-slate-500">Room Category:</span>
+            <p class="font-bold text-slate-800" id="modalRoomType">Standard King</p>
+          </div>
+          <div>
+            <span class="text-slate-500">Current Rate:</span>
+            <p class="font-bold text-slate-800" id="modalRoomRate">₹15,300/night</p>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Update Status:</label>
+            <select id="modalRoomStatusSelect" class="w-full px-3 py-2 border border-slate-200 rounded-xl font-medium">
+              <option value="available">Available (Clean & Ready)</option>
+              <option value="occupied">Occupied</option>
+              <option value="reserved">Reserved</option>
+              <option value="cleaning">Needs Housekeeping</option>
+              <option value="maintenance">Maintenance Blocked</option>
+            </select>
+          </div>
+          <div class="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
+            <button type="button" onclick="closeModal('modalRoomStatus')" class="px-3.5 py-1.5 border border-slate-200 text-slate-600 rounded-lg">Cancel</button>
+            <button type="button" onclick="saveRoomStatusChange()" class="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg shadow-sm">Save Status</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Frontend Pure JavaScript Logic -->
+    <script src="/app.js"></script>
+  </body>
+</html>

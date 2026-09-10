@@ -1,0 +1,6 @@
+{
+  "name": "Grand Vista Resort - Hotel Management System",
+  "description": "Smart 5-Star Hotel Operations & PMS with real-time room availability matrix, guest reservations, housekeeping queue, billing folios, staff roster, and executive analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
